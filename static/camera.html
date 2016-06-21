@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!--Jquery Script-->
+<script src="jquery-1.11.3.min.js"></script>
+
+<!-- JS Script -->
+<script>
+/*
+ * This program has been created by Phillip Ochola Mak'Anyengo to be used during 
+ * the ihub Research buildathon on OpenCV. Any use beyond this purpose should 
+ * be done with consent from the stated creator
+ */
+
+//Some needed constants
+var localUrl = "ws://localhost:550"; //Change to current ip address of Edison w.r.t user PC
+var control = new Object();
+control.state = 0;
+var connection;
+
+$().ready(function(){
+	//On Window.Load variables
+	var context = $('#canvas')[0].getContext('2d');
+	var currentProg = 3; //This is the current algorithm being implemented on the python script
+	var image = new Image();
+	var retryAttempts = 5;
+	
+	//Setup websocket when window loaded
+	localUrl = $("#ipAddress").val();
+	if(localUrl!=undefined)
+		connection = new WebSocket(localUrl);
+	
+	connection.onopen = function(evt) { 
+		console.log("Connection Initiated!");
+	}; 
+	
+	connection.onclose = function(evt) { 
+		if(retryAttempts>0){
+			localUrl = $("#ipAddress").val();
+			if(localUrl!=undefined)
+				connection = new WebSocket(localUrl);
+			retryAttempts--;
+		}
+		console.log("Connection to Websocket Closed!");
+	}; 
+	
+	connection.onmessage = function(evt) {
+		if (control.state == 1){
+			//console.log(evt.data);//Debugging Purposes
+			//Update canvas with image info
+			image.src = "data:image/jpg;base64,"+evt.data;
+			context.drawImage(image,2,2);
+			connection.send(currentProg);//Algorithm is recalled
+		}
+		else if (control.state == 2){
+			alert(evt.data);
+			control.state = 1;
+			connection.send(currentProg);//Algorithm is recalled
+		}
+
+	}; 
+	
+	connection.onerror = function(evt) {
+		console.log("Error on Connection!! : "+ evt.data);
+	}; 
+	
+	//Button functions
+	$("#startCam").click(function(){
+		control.state = 1;
+		if(connection.readyState===2||connection.readyState===3){
+			localUrl = $("#ipAddress").val();
+			if(localUrl!=undefined)
+				connection = new WebSocket(localUrl);
+			retryAttempts = 5;
+			//I shouldnt do this
+			//short term fix
+			connection.onopen = function(evt) { 
+				console.log("Connection Initiated!");
+				connection.send(1);
+				connection.send(3);
+			}; 
+		}
+		else if (connection.readyState===0){
+			connection.onopen = function(evt) { 
+				console.log("Connection Initiated!");
+				connection.send(1);
+				connection.send(3);
+			}; 
+		}
+		else {
+			connection.send(1);
+			connection.send(3);
+		}
+	});//Start Button
+	
+	$("#stopCam").click(function(){
+		connection.send(2);
+		control.state = 0;
+	});//Stop Button
+
+	$("#close").click(function(){
+		connection.close();
+		control.state = 0;
+	});//Close Button
+
+	$("#snapshot").click(function(){
+		connection.send(4);
+		control.state = 2;
+	});
+
+});
+</script>
+
+<!-- Bootstrap CSS  -->
+<link href="bootstrap.min.css"	rel="stylesheet">
+
+<!-- CSS StyleSheet -->
+<style>
+	body{
+		background-color:grey;
+	}
+	
+	.container{
+		background-color:white;
+		margin:auto;
+		padding:10px;
+	}
+	
+	.title{
+		width:600px;
+		margin:auto;
+	}
+
+	.pad {
+		width:650px;
+		height:600px;
+		margin:auto;
+	}
+	
+	.controlPad {
+		width: 240px;
+		margin:auto;
+	}
+</style>
+	
+<title>OpenCV Buildathon</title>
+
+</head>
+<body>
+<div class="navbar-wrapper">
+	<div class="navbar">
+		<div class="container">
+			<div class="title">	
+				<h1>OpenCV Buildathon Camera Viewer</h1>
+			</div>
+		</div>
+	</div>
+</div> 
+
+<div class="container-fluid">
+	<div class="container" id="controlPanel">
+		<div class="controlPad">
+			<button id="startCam" name="START">START</button>
+			<button id="stopCam" name="STOP">STOP</button>
+			<button id="snapshot" name="SNAPSHOT">SNAPSHOT</button>
+			<button id="close">CLOSE</button>
+			<input type="text" id="ipAddress" value="ws://localhost:5556">
+			</br>
+		</div>
+	</div>
+	<div class="container" style="border-top: solid 5px grey">
+		<div class="pad">
+			<canvas width="650px" height="590px" id="canvas" style="background-color:black;">
+			</canvas>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
