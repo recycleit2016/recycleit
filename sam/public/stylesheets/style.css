@@ -44,5 +44,39 @@ input {
 }
 
 .bags {
-  
+  height:200px;
+  width:175px;
+}
+
+.batt2 {
+  margin-left: 75px;
+  height:200px;
+  width:175px;
+}
+
+.batt{
+  width:225px;
+  height:200px;
+}
+
+.oil {
+  margin-top:25px;
+}
+
+.cup, .cup2  {
+  display:inline;
+  float:left;
+  margin-left:15px;
+}
+.search {
+  margin-top:-10px;
+}
+
+.notfound {
+  margin-top:-50px;
+}
+
+.selection {
+  font-size:16px;
+  border: 1px solid black;
 }
