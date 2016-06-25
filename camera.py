@@ -17,6 +17,7 @@ import time
 import numpy as np
 import base64
 import StringIO
+import RPi.GPIO as gpio
 import cv2
 from autobahn.twisted.websocket import WebSocketServerProtocol, WebSocketServerFactory
 from find_obj import filter_matches, explore_match
@@ -24,7 +25,16 @@ from find_obj import filter_matches, explore_match
 
 templates = ['0.png','1.png','2.png','3.png','4.png','5.png','6.png']
 templateNames = ['tissue','mouse','myIphone','gamepad','cap','deoderant','cup']
+categoryNames = ['green','red','blue']
 imageCounter = 0
+
+#Setup the GPIO pins
+gpio.setmode(gpio.BOARD)  # use P1 header pin numbering convention
+gpio.setwarnings(False)   # don't want to hear about how pins are already in use
+
+gpio.setup(8,gpio.OUT)
+gpio.setup(10,gpio.OUT)
+gpio.setup(11,gpio.OUT)
 
 #Websocket Event Handling
 class MyServerProtocol(WebSocketServerProtocol):
@@ -37,6 +47,7 @@ class MyServerProtocol(WebSocketServerProtocol):
 		
 	def onMessage(self, payload, isBinary):#Code that runs when message is triggered
 		message = format(payload.decode('utf8')) #Message decoded as utf8
+		category = 'none'
 		global imageCounter
 		#To enhance efficiency starting and stopping camera views separated
 		#However DO NOT FORGET to close a camera capture
@@ -143,6 +154,22 @@ class MyServerProtocol(WebSocketServerProtocol):
 				j+=1
 
 			self.sendMessage(result,isBinary = False)
+			if category == 'none' :
+				gpio.output(8,False)
+				gpio.output(10,False)
+				gpio.output(11,False)
+			elif category == 'green' :
+				gpio.output(8,True)
+				gpio.output(10,False)
+				gpio.output(11,False)
+			elif category == 'red' :
+				gpio.output(8,False)
+				gpio.output(10,True)
+				gpio.output(11,False)
+			elif category == 'blue' :
+				gpio.output(8,False)
+				gpio.output(10,False)
+				gpio.output(11,True)
 
 				
 	def onClose(self, wasClean, code, reason):#Message displayed when there is an error
