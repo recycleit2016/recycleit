@@ -41,7 +41,8 @@ function($stateProvider, $urlRouterProvider) {
   $stateProvider
     .state('detect', {
       url: '/detect',
-      templateUrl: '/detect.html'
+      templateUrl: '/detect.html',
+      controller: 'MainCtrl'
     });
   $stateProvider
     .state('elec', {
@@ -168,6 +169,20 @@ app.controller('MainCtrl', [
 function($scope, auth){
   $scope.isLoggedIn = auth.isLoggedIn;
   $scope.currentUser = auth.currentUser;
+  $scope.countdown = function() {
+    var count=10;
+    var counter=setInterval(timer, 1000); //1000 will  run it every 1 second
+    function timer(){
+      count=count-1;
+      if (count <= 0){
+        clearInterval(counter);
+        document.getElementById('bell').play();
+        // put code to take a snapshot
+        return;
+  }
+  document.getElementById("countdown").innerHTML=count; // watch for spelling
+    }
+  }
 }]);
 
 //controls registering and logging in
