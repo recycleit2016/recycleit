@@ -80,3 +80,46 @@ input {
   font-size:16px;
   border: 1px solid black;
 }
+
+.fa {
+  margin: 0 10px;
+  color: white;
+  padding: 2px 10px;
+  border-radius: 50%;
+}
+.green {
+  background-color:green;
+}
+.red {
+  background-color:red;
+}
+.blue {
+  background-color: blue;
+}
+.pink {
+  background-color: pink;
+}
+.purple {
+  background-color: purple;
+}
+.black {
+  background-color: black;
+}
+.brown {
+  background-color: brown;
+}
+.orange {
+  background-color: orange;
+}
+.yellow {
+  background-color: yellow;
+}
+.aqua {
+  background-color: aqua;
+}
+.tan {
+  background-color: tan;
+}
+.skyblue {
+  background-color: skyblue;
+}
