@@ -20,13 +20,16 @@ import base64
 import StringIO
 import cv2
 from autobahn.twisted.websocket import WebSocketServerProtocol, WebSocketServerFactory
+from find_obj import filter_matches, explore_match
 
 
 templates = ['0.png','1.png','2.png','3.png','4.png','5.png','6.png']
 templateNames = ['tissue','mouse','myIphone','gamepad','cap','deoderant','cup']
+imageCounter = 0
 
 #Websocket Event Handling
 class MyServerProtocol(WebSocketServerProtocol):
+	
 	def onConnect(self, request):#Message displayed when there is a connection
 		print "Connection opened"
 
@@ -35,7 +38,7 @@ class MyServerProtocol(WebSocketServerProtocol):
 		
 	def onMessage(self, payload, isBinary):#Code that runs when message is triggered
 		message = format(payload.decode('utf8')) #Message decoded as utf8
-		
+		global imageCounter
 		#To enhance efficiency starting and stopping camera views separated
 		#However DO NOT FORGET to close a camera capture
 		if (message == '1'):#Start Camera Capture
@@ -52,41 +55,98 @@ class MyServerProtocol(WebSocketServerProtocol):
 			#Replace your own code here. Below is a simple example
 
 			ret,frame = self.cap.read()
-			
+			fframe = cv2.flip(frame,1)
 			
 			
 			#The code below sends the captured frame to the Camera viewer. DO NOT DELETE
 			#the image is passed to the encoder as frame, you can pass any other image matrix
 			encode_param=[1,90]
-			res, image = cv2.imencode('.jpg',frame,encode_param)
+			res, image = cv2.imencode('.png',fframe,encode_param)
 			sample = base64.b64encode(image)
 			self.sendMessage(sample, isBinary)
 			
-		#This will take the current snapshot and compare it with template images,
-		#If it finds a matching image it sends the name of the image back,
-		#if it doesnt it replies unknown
+		#This algorithm saves an image from the camera. Used for training
 		#Hope it works
-		if (message == '4'): #add extra algorithms like this
+		if (message == '4'):
 
 			ret,frame = self.cap.read()
-			objectType = 'unknown'
-			i = 0;
+			fframe = cv2.flip(frame,1)
+
+			encode_param=[1,90]
+			#res, savingImage = cv2.imencode('.png',fframe,encode_param)
+			name = 'capture/' + `imageCounter` +'.png'
+			print "Saving Image", name
+			cv2.imwrite(name, fframe)
+			imageCounter += 1
+			self.sendMessage("Saved",isBinary = False)
+			self.sendMessage("Saved",isBinary = False)
+
+
+		#This will take the snap shot and find similarities with the images
+		#if it doesnt it replies unknown
+		if (message == '5'): #add extra algorithms like this
+
+			ret,frame = self.cap.read()
+			fframe = cv2.flip(frame,1)
+
+			j = 0;
+			result = "unknown"
+
 			for item in templates:
-				tmp = cv2.imread('res/'+templates[i])
-				method = cv2.TM_CCOEFF_NORMED
-				#Apply template matching
-				res = cv2.matchTemplate(frame,tmp,method)
-				min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-				print templateNames[i]
-				print max_val - min_val
-				print "width: ", (max_loc[0] - min_loc[0])
-				print "height: ", (max_loc[1] - min_loc[1])
+				tmp = cv2.imread('res/'+item)
 
-				if (res.size >0):
-					objectType = templateNames[i]
-				i+=1
+				orb = cv2.ORB()
+				kp1, des1 = orb.detectAndCompute(fframe,None)
+				kp2, des2 = orb.detectAndCompute(tmp,None)
 
-			self.sendMessage(objectType,~isBinary)
+				bf = cv2.BFMatcher(cv2.NORM_HAMMING)#, crossCheck=True)
+				matches = bf.knnMatch(des1, trainDescriptors = des2, k=2)
+
+				p1, p2, kp_pairs = filter_matches(kp1, kp2, matches)
+	
+				i = 0
+				m1 = np.array([])
+				m2 = np.array([])
+				mp_pairs = np.array([])
+
+				for p in p1:
+					if(p[0]>266 and p[0]<1014 and p[1]>45 and p[1]<675):
+						m1 = np.append(m1, p1[i] - np.array([266,0]), axis=0)
+						m2 = np.append(m2, p2[i], axis=0)
+						mp_pairs = np.append(mp_pairs, kp_pairs[i], axis=0)
+					i+=1
+
+				m1 = np.reshape(m1,(-1,2))
+				m2 = np.reshape(m2,(-1,2))
+
+				try:
+					homeo = cv2.findHomography(p1,p2, method=0)
+					print homeo
+				except Exception:
+					pass
+
+				stackSize = m1.size / 2
+				#print m1/m2
+				ratio = np.sum( m1/m2, axis=0)
+
+				#print stackSize, ratio
+				try:
+					xSim = abs(((stackSize - ratio[0]) / stackSize) * 100)
+					ySim = abs(((stackSize - ratio[1]) / stackSize) * 100)
+				except:
+					pass
+
+				if(~np.isnan(xSim) or ~np.isnan(ySim)):
+					print (xSim + ySim)/2
+					if (((xSim + ySim)/2) > 80):
+						result = templateNames[j]
+						
+				print result
+
+				j+=1
+
+			self.sendMessage(result,isBinary = False)
+			self.sendMessage(result,isBinary = False)
 
 				
 	def onClose(self, wasClean, code, reason):#Message displayed when there is an error
