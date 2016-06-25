@@ -14,7 +14,6 @@
 
 #Import all the libraries needed
 import time
-import json
 import numpy as np
 import base64
 import StringIO
@@ -70,7 +69,7 @@ class MyServerProtocol(WebSocketServerProtocol):
 		if (message == '4'):
 
 			ret,frame = self.cap.read()
-			fframe = cv2.flip(frame,1)
+			#fframe = cv2.flip(frame,1)
 
 			encode_param=[1,90]
 			#res, savingImage = cv2.imencode('.png',fframe,encode_param)
@@ -78,7 +77,6 @@ class MyServerProtocol(WebSocketServerProtocol):
 			print "Saving Image", name
 			cv2.imwrite(name, fframe)
 			imageCounter += 1
-			self.sendMessage("Saved",isBinary = False)
 			self.sendMessage("Saved",isBinary = False)
 
 
@@ -121,7 +119,6 @@ class MyServerProtocol(WebSocketServerProtocol):
 
 				try:
 					homeo = cv2.findHomography(p1,p2, method=0)
-					print homeo
 				except Exception:
 					pass
 
@@ -140,12 +137,11 @@ class MyServerProtocol(WebSocketServerProtocol):
 					print (xSim + ySim)/2
 					if (((xSim + ySim)/2) > 80):
 						result = templateNames[j]
-						
+
 				print result
 
 				j+=1
 
-			self.sendMessage(result,isBinary = False)
 			self.sendMessage(result,isBinary = False)
 
 				

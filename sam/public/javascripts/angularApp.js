@@ -167,22 +167,82 @@ app.controller('MainCtrl', [
 '$state',
 'auth',
 function($scope, auth){
+  $scope.control = {};
+  $scope.currentProg = 3; //This is the current algorithm being implemented on the python script
+  $scope.image = new Image();
+  $scope.retryAttempts = 3;
+  
   $scope.isLoggedIn = auth.isLoggedIn;
   $scope.currentUser = auth.currentUser;
+
   $scope.countdown = function() {
     var count=10;
     var counter=setInterval(timer, 1000); //1000 will  run it every 1 second
     function timer(){
       count=count-1;
       if (count <= 0){
-        clearInterval(counter);
+        clearInterval(counter); //Clear the counter
+        $scope.connection.send(5); //Send the command for match algorithm
+        $scope.control.state = 2; //Change the state to 2
         document.getElementById('bell').play();
-        // put code to take a snapshot
-        return;
-  }
-  document.getElementById("countdown").innerHTML=count; // watch for spelling
+        return; // put code to take a snapshot
+      }
+      document.getElementById("countdown").innerHTML=count; // watch for spelling
     }
   }
+
+  $scope.$on('$viewContentLoaded', function(){
+    $scope.context = document.getElementById('canvas').getContext('2d');
+    $scope.control.state = 1;
+    
+    //Setup websocket when window loaded
+    $scope.connection = new WebSocket("ws://localhost:5556");
+    
+    $scope.connection.onopen = function(evt) { 
+      console.log("Connection Initiated!");
+      $scope.connection.send(1);
+      $scope.connection.send(3);
+      $scope.countdown(); //Run the count down algorithm
+      
+    }; 
+    
+    $scope.connection.onclose = function(evt) { 
+      console.log("Connection to Websocket Closed!");
+    }; 
+    
+    $scope.connection.onmessage = function(evt) {
+      if ($scope.control.state == 1){
+        //console.log(evt.data);//Debugging Purposes
+        //Update canvas with image info
+        $scope.image.src = "data:image/jpg;base64,"+evt.data;
+        
+        $scope.context.drawImage($scope.image,2,2);
+        $scope.context.rect(90,60,270,260);
+        $scope.context.stroke();
+        setTimeout(function(){
+          $scope.connection.send(3);
+        },100); //Set timeout
+      }
+      else if ($scope.control.state == 2){
+        if(evt.data.length<15){
+
+ /*         switch(evt.data){
+ //           case:
+ //           break;
+          } */
+          console.log(evt.data);
+        }
+
+        //Switch Statement
+        //$scope.control.state = 3;
+      }
+    }; 
+    
+    $scope.connection.onerror = function(evt) {
+      console.log("Error on Connection!! : "+ evt.data);
+    };
+  });
+  
 }]);
 
 //controls registering and logging in
@@ -207,6 +267,7 @@ function($scope, $state, auth){
     });
   };
 }])
+
 app.controller('NavCtrl', [
 '$scope',
 'auth',
@@ -215,3 +276,5 @@ function($scope, auth){
   $scope.currentUser = auth.currentUser;
   $scope.logOut = auth.logOut;
 }]);
+
+
