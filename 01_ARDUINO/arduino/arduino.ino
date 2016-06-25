@@ -1,65 +1,78 @@
+#define trigPin1 8
+#define echoPin1 7
+#define trigPin2 12
+#define echoPin2 11
+#define trigPin3 4
+#define echoPin3 3
 
- 
-#define echoPin 7 // Echo Pin
-#define echoPin_r 11 // Echo Pin red
-#define trigPin 8 // Trigger Pin
-#define trigPin_r 12 // Trigger Pin red
-#define LEDPin 13 // Onboard LED
-#define LEDPin_r 6 // Onboard LED red
- 
+#define LEDPin1 13 // Onboard LED blue
+#define LEDPin2 6 // Onboard LED red
+#define LEDPin3 5 // Onboard LED grin
+
 int maximumRange = 200; // Maximum range needed
-int minimumRange = 0; // Minimum range needed   
-long duration, duration_r,  distance , distance_r ; // Duration used to calculate distance
- 
-void setup() {
- Serial.begin (9600);
- pinMode(trigPin, OUTPUT);
- pinMode(trigPin_r, OUTPUT);
- pinMode(echoPin, INPUT);
- pinMode(echoPin_r, INPUT);
- pinMode(LEDPin, OUTPUT); // Use LED indicator 
- pinMode(LEDPin_r, OUTPUT); 
+int minimumRange = 0; // Minimum range needed 
+long duration, distance, BlueSensor,RedSensor,GrinSensor;
+
+void setup()
+{
+Serial.begin (9600);
+pinMode(trigPin1, OUTPUT);
+pinMode(echoPin1, INPUT);
+pinMode(trigPin2, OUTPUT);
+pinMode(echoPin2, INPUT);
+pinMode(trigPin3, OUTPUT);
+pinMode(echoPin3, INPUT);
+
+pinMode(LEDPin1, OUTPUT);
+pinMode(LEDPin2, OUTPUT);
+pinMode(LEDPin3, OUTPUT);
 }
- 
+
 void loop() {
-/* The following trigPin/echoPin cycle is used to determine the
- distance of the nearest object by bouncing soundwaves off of it. */ 
- digitalWrite(trigPin, LOW);
- digitalWrite(trigPin_r, HIGH); 
- delayMicroseconds(2); 
- 
- digitalWrite(trigPin, HIGH);
- digitalWrite(trigPin_r, HIGH);
- delayMicroseconds(10); 
- 
- digitalWrite(trigPin, LOW);
- digitalWrite(trigPin_r, LOW);
- duration = pulseIn(echoPin, HIGH);
- duration_r = pulseIn(echoPin_r, HIGH);
- 
- //Calculate the distance (in cm) based on the speed of sound.
- distance = duration/58.2;
- distance_r = duration_r/58.2;
- 
- if (distance >= maximumRange || distance <= minimumRange){
+SonarSensor(trigPin1, echoPin1);
+BlueSensor = distance;
+SonarSensor(trigPin2, echoPin2);
+RedSensor = distance;
+SonarSensor(trigPin3, echoPin3);
+GrinSensor = distance;
+Serial.println(BlueSensor);
+Serial.println(RedSensor);
+Serial.println(GrinSensor);
+}
+
+void SonarSensor(int trigPin,int echoPin)
+{
+digitalWrite(trigPin, LOW);
+delayMicroseconds(2); 
+digitalWrite(trigPin, HIGH);
+delayMicroseconds(10);
+digitalWrite(trigPin, LOW);
+duration = pulseIn(echoPin, HIGH);
+distance = (duration/2) / 29.1;
+
+if (distance >= maximumRange || distance <= minimumRange){
  /* Send a negative number to computer and Turn LED OFF 
  to indicate "out of range" */
   Serial.println("-1");
-  digitalWrite(LEDPin, LOW); 
+  digitalWrite(LEDPin1, LOW);
+  digitalWrite(LEDPin2, LOW);
+  digitalWrite(LEDPin3, LOW); 
  }
- else if(distance >= maximumRange || distance <= minimumRange){
-  Serial.println("-1");
-  digitalWrite(LEDPin_r, LOW);
- }
+
  else{
  /* Send the distance to the computer using Serial protocol, and
  turn LED ON to indicate successful reading. */
   Serial.println(distance);
-  Serial.println(distance_r);
-  digitalWrite(LEDPin, HIGH);
-  digitalWrite(LEDPin_r, HIGH);
+  Serial.println(BlueSensor);
+  Serial.println(RedSensor);
+  Serial.println(GrinSensor);
+  
+  digitalWrite(LEDPin1, HIGH); 
+  digitalWrite(LEDPin2, HIGH);
+  digitalWrite(LEDPin3, HIGH);
  }
  
- //Delay 10ms before next reading.
- delay(10);
+ //Delay 50ms before next reading.
+ delay(100);
 }
+
