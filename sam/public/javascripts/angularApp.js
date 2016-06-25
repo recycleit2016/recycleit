@@ -171,7 +171,7 @@ function($scope, auth){
   $scope.currentProg = 3; //This is the current algorithm being implemented on the python script
   $scope.image = new Image();
   $scope.retryAttempts = 3;
-  
+
   $scope.isLoggedIn = auth.isLoggedIn;
   $scope.currentUser = auth.currentUser;
 
@@ -185,6 +185,7 @@ function($scope, auth){
         $scope.connection.send(5); //Send the command for match algorithm
         $scope.control.state = 2; //Change the state to 2
         document.getElementById('bell').play();
+        document.getElementById("countdown").innerHTML='&nbsp;';
         return; // put code to take a snapshot
       }
       document.getElementById("countdown").innerHTML=count; // watch for spelling
@@ -194,28 +195,28 @@ function($scope, auth){
   $scope.$on('$viewContentLoaded', function(){
     $scope.context = document.getElementById('canvas').getContext('2d');
     $scope.control.state = 1;
-    
+
     //Setup websocket when window loaded
     $scope.connection = new WebSocket("ws://localhost:5556");
-    
-    $scope.connection.onopen = function(evt) { 
+
+    $scope.connection.onopen = function(evt) {
       console.log("Connection Initiated!");
       $scope.connection.send(1);
       $scope.connection.send(3);
       $scope.countdown(); //Run the count down algorithm
-      
-    }; 
-    
-    $scope.connection.onclose = function(evt) { 
+
+    };
+
+    $scope.connection.onclose = function(evt) {
       console.log("Connection to Websocket Closed!");
-    }; 
-    
+    };
+
     $scope.connection.onmessage = function(evt) {
       if ($scope.control.state == 1){
         //console.log(evt.data);//Debugging Purposes
         //Update canvas with image info
         $scope.image.src = "data:image/jpg;base64,"+evt.data;
-        
+
         $scope.context.drawImage($scope.image,2,2);
         $scope.context.rect(90,60,270,260);
         $scope.context.stroke();
@@ -226,23 +227,32 @@ function($scope, auth){
       else if ($scope.control.state == 2){
         if(evt.data.length<15){
 
- /*         switch(evt.data){
- //           case:
- //           break;
-          } */
+          switch(evt.data){
+              case 'electronics':
+              location.href = "/#/elec";
+              break;
+              case 'plastic':
+              location.href = "/#/plastic";
+              break;
+              case 'metal':
+              location.href = "/#/cans";
+              break;
+              default:
+              location.href = "/#/etc";
+          }
           console.log(evt.data);
         }
 
         //Switch Statement
         //$scope.control.state = 3;
       }
-    }; 
-    
+    };
+
     $scope.connection.onerror = function(evt) {
       console.log("Error on Connection!! : "+ evt.data);
     };
   });
-  
+
 }]);
 
 //controls registering and logging in
@@ -276,5 +286,3 @@ function($scope, auth){
   $scope.currentUser = auth.currentUser;
   $scope.logOut = auth.logOut;
 }]);
-
-
