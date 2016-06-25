@@ -124,7 +124,7 @@
         </div>
 
         <div class='row'>
-          <div class='col-sm-offset-1 col-sm-8'>
+          <div class='col-sm-8'>
             <h3>Plastic Bags</h3>
             <h5>(including snack bags, candy wrappers, etc.)</h5>
                 <ul>
@@ -136,6 +136,11 @@
             <h3>String</h3>
                 <p>If it's stiff string with a plastic coating, recycle with plastic</p>
                 <p>Otherwise, it goes in the plastic bag bin</p>
+          </div>
+          <div class='col-sm-4'>
+            <br>
+            <img class="bags" style="width:120%;" src='/images/bag2.png'></img><br>
+            <img class="bags" src='/images/bag3.png'></img><br>
           </div>
         </div>
       </div>
@@ -260,10 +265,16 @@
     </script>
 
     <script type="text/ng-template" id="/detect.html">
+      <audio id="bell"
+              src="http://www.soundjay.com/mechanical/sounds/camera-shutter-click-01.mp3"
+              preload="auto">
+      </audio>
       <div class='container'>
 
         <h1>Please put your object under the sensor</h1>
-          <div class='countdown'>5</div>
+          <div id='countdown'>10</div>
+
+          <button ng-click="countdown()">Start</button>
 
       </div>
       <form method="get" action="/#/home">
