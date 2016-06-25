@@ -11,9 +11,9 @@
 
 
 //GPIO PORT IN
-#define LEDPin1 9 // Red
-#define LEDPin2 10 // Green
-#define LEDPin3 2 // Blue
+#define PININ1 9 // Red
+#define PININ2 10 // Green
+#define PININ3 2 // Blue
 
 #define TESTPIN 1 //TEST PIN
 
@@ -27,7 +27,7 @@ int lflag=1; //int lflag1=1, lflag2=1, lflag3=1;
 
 void setup()
 {
-	//Serial.begin (9600);
+	Serial.begin (9600);
 	pinMode(trigPin1, OUTPUT);
 	pinMode(echoPin1, INPUT);
 	pinMode(trigPin2, OUTPUT);
@@ -42,20 +42,34 @@ void setup()
 	pinMode(PININ1, INPUT);
 	pinMode(PININ2, INPUT);
 	pinMode(PININ3, INPUT);
-	
-	pinMode(PINOUT1, OUTPUT);
-	
-	pinMode(PINOUT1, HIGH);
+
+  pinMode(TESTPIN, OUTPUT);
+  
+  pinMode(TESTPIN, HIGH);
 }
 
 void loop() {
 	if (gFlag) {
 		gFlag = 0;
-		if (PININ1 == 1 && PININ2 == 0 && PININ3 == 0) {
+
+  //digitalRead(PININ2, HIGH);
+  //digitalRead(PININ3, HIGH);
+
+    int in1 = digitalRead(PININ1);
+    int in2 = digitalRead(PININ2);
+    int in3 = digitalRead(PININ3);
+    
+    if (in1 == HIGH && in2 == LOW && in3 == LOW) {
+      Serial.println("REDSensor");
+      digitalWrite(LEDPin1, HIGH); 
 			flag1=1;
-		} else if (PININ1 == 0 && PININ2 == 1 && PININ3 == 0) {
+		} else if (in1 == LOW && in2 == HIGH && in3 == LOW) {
+      Serial.println("GREENSensor");
+      digitalWrite(LEDPin2, HIGH); 
 			flag2=1;
-		} else if (PININ1 == 0 && PININ2 == 0 && PININ3 == 1) {
+		} else if (in1 == LOW && in2 == LOW && in3 == HIGH) {
+      Serial.println("BLUESensor");
+      digitalWrite(LEDPin3, HIGH); 
 			flag3=1;
 		}
 	}
@@ -68,6 +82,7 @@ void loop() {
 		}
 		BlueSensor = distance;
 	} else if (flag2 == 1) {
+    Serial.println("1111111111111112");
 		SonarSensor(trigPin2, echoPin2);
 		if (!lflag) {
 			digitalWrite(LEDPin2, LOW);
@@ -75,6 +90,7 @@ void loop() {
 		}
 		RedSensor = distance2;
 	} else if (flag3 == 1) {
+    Serial.println("1111111111111113");
 		SonarSensor(trigPin3, echoPin3);
 		if (!lflag) {
 			digitalWrite(LEDPin3, LOW);
