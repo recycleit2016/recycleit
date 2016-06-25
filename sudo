@@ -1,0 +1,1 @@
+HIsudo rfcomm listen hci0&! /dev/rfcomm0

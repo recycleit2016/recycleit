@@ -1,0 +1,11 @@
+
+> recycleIt@0.0.0 start /home/pi/recycleit/sam
+> node ./bin/www
+
+[0mGET / [36m304 [0m169.578 ms - -[0m
+[0mGET /stylesheets/style.css [36m304 [0m31.386 ms - -[0m
+[0mGET /javascripts/angularApp.js [36m304 [0m33.934 ms - -[0m
+[0mGET /favicon.ico [33m404 [0m30.612 ms - 1484[0m
+[0mGET /? [36m304 [0m28.083 ms - -[0m
+[0mGET /stylesheets/style.css [36m304 [0m3.803 ms - -[0m
+[0mGET /javascripts/angularApp.js [36m304 [0m3.509 ms - -[0m

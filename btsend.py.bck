@@ -1,0 +1,18 @@
+import bluetooth
+ 
+bd_addr = "98:D3:31:50:0A:CE"
+target_name = "Recycleit Client"
+target_address = None
+
+port = 1
+sock = bluetooth.BluetoothSocket (bluetooth.RFCOMM)
+sock.connect((bd_addr,port))
+ 
+while 1:
+        tosend = raw_input()
+        if tosend != 'q':
+                sock.send(tosend)
+        else:
+                break
+ 
+sock.close()

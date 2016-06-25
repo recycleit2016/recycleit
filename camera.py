@@ -23,9 +23,9 @@ from autobahn.twisted.websocket import WebSocketServerProtocol, WebSocketServerF
 from find_obj import filter_matches, explore_match
 
 
-templates = ['0.png','1.png','2.png','3.png','4.png','5.png','6.png']
-templateNames = ['tissue','mouse','myIphone','gamepad','cap','deoderant','cup']
-categoryNames = ['green','red','blue']
+templates = ['0.png','1.png','2.png']
+templateNames = ['metal','plastic','electronics']
+categoryNames = ['red','blue','green']
 imageCounter = 0
 
 #Setup the GPIO pins
@@ -80,7 +80,7 @@ class MyServerProtocol(WebSocketServerProtocol):
 		if (message == '4'):
 
 			ret,frame = self.cap.read()
-			#fframe = cv2.flip(frame,1)
+			fframe = cv2.flip(frame,1)
 
 			encode_param=[1,90]
 			#res, savingImage = cv2.imencode('.png',fframe,encode_param)
@@ -100,6 +100,7 @@ class MyServerProtocol(WebSocketServerProtocol):
 
 			j = 0;
 			result = "unknown"
+			category = "none"
 
 			for item in templates:
 				tmp = cv2.imread('res/'+item)
@@ -148,6 +149,7 @@ class MyServerProtocol(WebSocketServerProtocol):
 					print (xSim + ySim)/2
 					if (((xSim + ySim)/2) > 80):
 						result = templateNames[j]
+						category = categoryNames[j]
 
 				print result
 
