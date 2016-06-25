@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>Recycle It</title>
+
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+        integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular.min.js"></script>
+  <script src="/javascripts/angularApp.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.js"></script>
+</head>
+
+<body ng-app="recycleIt">
+  <!-- Shows welcome message or log in / register options -->
+    <ul ng-controller='NavCtrl' class="nav navbar-nav" id="user-nav">
+        <li ng-show="isLoggedIn()" class="text-capitalize"><a>Welcome, <strong>{{ currentUser() }}</strong>!</a></li>
+        <li ng-show="isLoggedIn()"><a ng-click="logOut()">Log Out</a></li>
+        <li ng-hide="isLoggedIn()"><a href="/#/login">Log In</a></li>
+        <li ng-hide="isLoggedIn()"><a href="/#/register">Register</a></li>
+    </ul>
+  <ui-view></ui-view>
+
+
+    <script type="text/ng-template" id="/home.html">
+
+      <div class='container text-center'>
+            <a href="/#/detect">
+              <button type='button' class="btn btn-primary detect">Click here to detect your object</button>
+            </a>
+
+            <a href='/#/search'>
+              <button type='button' class="btn btn-primary search">Click here to search for your object</button>
+            </a>
+
+      </div>
+    </script>
+
+    <!-- Login page template -->
+<script type="text/ng-template" id="/login.html">
+
+   <!-- Shows error message if there is a problem -->
+   <div ng-show="error" class="alert alert-danger row">
+     <span>{{ error.message }}</span>
+   </div>
+   <!-- Login form -->
+   <form ng-submit="logIn()"
+     style="margin-top:30px;">
+     <h3>Log In</h3>
+
+     <!-- Username -->
+     <div class="form-group">
+       <input type="text"
+       class="form-control"
+       placeholder="Username"
+       ng-model="user.username"
+       style="width:30%;"></input>
+     </div>
+
+     <!-- Password -->
+     <div class="form-group">
+       <input type="password"
+       class="form-control"
+       placeholder="Password"
+       ng-model="user.password"
+       style="width:30%;"></input>
+     </div>
+
+     <!-- Login button -->
+     <button type="submit" class="btn btn-primary">Log In</button>
+  </form>
+
+</script><!-- End of login page template -->
+
+<!-- Register page template -->
+<script type="text/ng-template" id="/register.html">
+
+   <!-- Shows error message if there is a problem -->
+   <div ng-show="error" class="alert alert-danger row">
+     <span>{{ error.message }}</span>
+   </div>
+
+   <!-- Register form -->
+   <form ng-submit="register()"
+     style="margin-top:30px;">
+     <h3>Register</h3>
+
+     <!-- Username -->
+     <div class="form-group">
+       <input type="text"
+       class="form-control"
+       id="trial"
+       placeholder="Username"
+       ng-model="user.username"
+       style="width:30%;"></input>
+     </div>
+
+     <!-- Password -->
+     <div class="form-group">
+       <input type="password"
+       class="form-control"
+       placeholder="Password"
+       ng-model="user.password"
+       style="width:30%;"></input>
+     </div>
+
+     <!-- Register button -->
+     <button type="submit" class="btn btn-primary">Register</button>
+  </form>
+
+</script> <!-- End of register page template -->
+
+
+    <script type="text/ng-template" id="/bags.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Plastic Bags</h1>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-offset-1 col-sm-8'>
+            <h3>Plastic Bags</h3>
+            <h5>(including snack bags, candy wrappers, etc.)</h5>
+                <ul>
+                  <li>If dirty, clean or throw into trash</li>
+                  <li>Plase plastic bags into a clear plastic bag to recycle</li>
+                </ul>
+            <h3>Bubble Wrap</h3>
+                <p>Put in clear plastic bag</p>
+            <h3>String</h3>
+                <p>If it's stiff string with a plastic coating, recycle with plastic</p>
+                <p>Otherwise, it goes in the plastic bag bin</p>
+          </div>
+        </div>
+      </div>
+      <form method="get" action="/#/home">
+      <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/batteries.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Batteries</h1>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-offset-1 col-sm-6'>
+            <h3>Batteries</h3>
+                <p>Batteries should be removed from electronics</p>
+                <p>They should have their own seperate box, if not, take them to the nearest convenient store or social security center<p>
+          </div>
+
+
+        </div>
+        <form method="get" action="/#/home">
+        <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/bulbs.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Light Bulbs</h1>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-offset-1 col-sm-8'>
+            <h3>Light Bulbs</h3>
+                <ul>
+                  <li>If very fragile or broken, wrap and throw in trash</li>
+                  <li>Otherwise, put it in it's specific bin.</li>
+                </ul>
+            <h3>LED Bulbs</h3>
+                <p>Not recycleable, wrap and throw in trash.</p>
+            <h3>Incandescent Lamps</h3>
+                <p>Not recycleable, wrap and throw in trash.</p>
+          </div>
+
+
+        </div>
+        <form method="get" action="/#/home">
+        <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/cans.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Cans / Metal</h1>
+          <h4>Did you know it takes 500 years for aluminum cans to decompose?</h4>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-6'>
+            <h3>Cans</h3>
+                <p>Remove internal/external plastic lids and clean</p>
+
+            <h3>Aerosol Cans</h3>
+                <p>If possible, drill a hole to empty all gas.</p>
+
+            <h3>Other Metal (tools, nails, wire, etc)</h3>
+                <p>Put items in a plastic bag</p>
+          </div>
+
+          <div class='col-sm-6'>
+            <h1>FAQ</h1>
+
+            <p><strong>What do I do with an umbrella?</strong></p>
+            <p>If possible, seperate in into seperate materials. If you can't, throw it in the metal bin.</p>
+
+            <p><strong>Do I have to drill a hole in aerosol cans?</strong></p>
+            <p>It is recommended, but if not possible, please hold the button down to ensure that all gas has been released.</p>
+
+          </div>
+        </div>
+
+      </div>
+      <form method="get" action="/#/home">
+      <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/clothes.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Fabric / Clothes</h1>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-offset-1 col-sm-8'>
+            <h3>Fabric / Clothes</h3>
+              <p>Fabric and clothes have their own special bin</p>
+              <strong><p>These items CAN go in the bin:</p></strong>
+                <ul>
+                  <li>Used clothes</li>
+                  <li>footwear</li>
+                  <li>bags</li>
+                  <li>thin blankets / quilts</li>
+                  <li>curtains</li>
+                  <li>carpet</li>
+                </ul>
+                <strong><p>These items CAN'T go in the bin:<br></strong>
+                (Either throw them in trash or declare large waste)</p>
+                  <ul>
+                    <li>large comfortors / cotton blankets</li>
+                    <li>pillows / cushions</li>
+                    <li>roller skates</li>
+                    <li>bags with wheels</li>
+                  </ul>
+
+          </div>
+
+
+        </div>
+        <form method="get" action="/#/home">
+        <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/detect.html">
+      <div class='container'>
+
+        <h1>Please put your object under the sensor</h1>
+          <div class='countdown'>5</div>
+
+      </div>
+      <form method="get" action="/#/home">
+      <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/elec.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Electronics</h1>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-offset-1 col-sm-7'>
+            <h3>Small Electronics (smaller than 1m)</h3>
+              <p>Put into specified bin<br>
+                If no bin available, bring to your local ('dong') government office.</p>
+            <h3>Large Electronics (larger than 1m)</h3>
+              <p>If they are in working order, they can be donated to your local ('dong') government office.<br>
+                Otherwise, they must be declared as large waste.</p>
+          </div>
+
+
+        </div>
+        <form method="get" action="/#/home">
+        <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/etc.html">
+      <div class='text-center'>
+    <h3>Everything else</h3>
+    <h5>If you did not see your item, it is most likely non-recycleable.<br>
+      If it is too large to fit in to a trash bag, it must be declared as large waste.<br>
+      If you are ever unsure of how to throw away or recycle something, call the English help-line at 1330.<br>
+      Below are some commonly confusing items which are all non-recycleable.
+      <img id='nonrecycle' src='/images/nonrecycle.png' />
+    </div>
+    <form method="get" action="/#/home">
+    <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/glass.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Bottles / Glass</h1>
+          <h4>Currently more than 90% of bottles are recycled!</h4>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-6'>
+            <h3>Bottles</h3>
+            <ul>
+                <li>Remove plastic or aluminum lids and clean inside</li>
+                <li>Do not put substances inside</li>
+                <li>Beer, soju and drink bottles can be returned to the market to earn cash back!</li>
+            </ul>
+
+            <h3>Other Glass</h3>
+              <ul>
+                  <li>Fragile glass is not recycleable!</li>
+                  <li>Heat resistant (microwaveable) glass should have a seperate bin.</li>
+                  <li>Other glass should be cleaned and recycled with bottles.</li>
+              </ul>
+
+          </div>
+
+          <div class='col-sm-6'>
+            <h1>FAQ</h1>
+
+            <p><strong>What do I do with fragile glass?</strong></p>
+            <p>Small amounts can be wrapped and thrown out with your trash. Large amounts require a special bag which can be bought at your local mart.</p>
+
+            <p><strong>What if I don't have a seperate bin for heat resistant glass?</strong></p>
+            <p>If no seperate bin is provided, recycle it with your other glass.</p>
+
+          </div>
+        </div>
+
+      </div>
+      <form method="get" action="/#/home">
+      <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/oil.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Oil</h1>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-offset-1 col-sm-10'>
+            <h3>Cooking Oil</h3>
+              <p>Do NOT throw your oil down the sink</p>
+              <p>If you have a specified container, strain the oil and pour into container</p>
+              <p>Alternatively, you can dry the oil with cat litter or sand, and throw it with trash</p>
+              <p>If those options are not possible, call the number below for more information</p>
+
+
+            <h3>Auto Oil</h3>
+              <p>Put in a secure container and call the number below for more information</p>
+              <table>
+              <tr><th>If you live in:</th><th>Call:</th></tr>
+              <tr><td>Gangnam, Seocho, Dongjak or Gwanak</td><td>031)542-0138</td></tr>
+              <tr><td>Gangdong, Songpa, Gwangjin, Jongno or Seongdong</td><td>031)703-4516</td></tr>
+              <tr><td>Guro, Yangcheon, Gangseo, Yeongdeungpo or Geumcheon</td><td>031)318-5150</td></tr>
+              <tr><td>Eunpyeong, Seodaemun, Mapo, Junggu or Yongsan</td><td>031)339-2952</td></tr>
+              <tr><td>Dobong, Gangbok, Seongbok, Dongdaemun or Nowon</td><td>031)431-9537</td></tr>
+            </table>
+          </div>
+
+
+        </div>
+        <form method="get" action="/#/home">
+        <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/paper.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Paper</h1>
+          <h4>(Should not be wet)</h4>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-6'>
+            <h3>Newspapers</h3>
+                <ul>
+                  <li>Make sure they are not wet</li>
+                  <li>If throwing away many at once, please tie them with a string or place them in a box.</li>
+                </ul>
+            <h3>
+              Notebooks, Paper Bags<br>
+              Calendars, Paper Wrappers<br>
+              etc..
+            </h3>
+                <p>If possible, remove plastic cover and/or spring.</p>
+            <h3>Boxes</h3>
+                <p>Remove all tape, strings or pins.</p>
+          </div>
+
+          <div class='col-sm-6'>
+            <h1>FAQ</h1>
+
+            <p><strong>Are fragments of paper and receipts recyclable?</strong></p>
+            <p>Yes, but please be aware of your personal information on receipts before throwing them away!</p>
+
+            <p><strong>Are paper towels or toilet paper recyclable?</strong></p>
+            <p>If they were used only to clean up water, then yes! Otherwise, throw them with your general rubbish.</p>
+
+            <p><strong>Can I recycle coated paper like brochures or advertisements?</strong></p>
+            <p>Unfortonately no, please throw them away with your general rubbish.</p>
+
+          </div>
+        </div>
+
+      </div>
+      <form method="get" action="/#/home">
+      <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/papercups.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Paper Cups and Cartons</h1>
+          <h4>(Should not be wet)</h4>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-6'>
+            <h3>Paper Cups</h3>
+                <ul>
+                  <li>Make sure they are not wet</li>
+                  <li>Please rinse the inside before recycling.</li>
+                  <li>Make sure it is not mixed with paper sheets.</li>
+                  <li>(If it does not have a designated bin, you can recycle with other paper products)</li>
+                  <li>If the inside is dirty with leftover food or cigarette butts, throw it in the trash</li>
+                </ul>
+            <h3>Paper Cartons</h3>
+                <ul>
+                  <li>Empty, clean and press before recycling.</li>
+                  <li>Make sure it is not mixed with paper sheets.</li>
+                  <li>(If it does not have a designated bin, you can recycle with other paper products)</li>
+                </ul>
+          </div>
+
+          <div class='col-sm-6'>
+            <h1>FAQ</h1>
+
+            <p><strong>Why are cups and cartons recycled seperate from paper?</strong></p>
+            <p>The process of pulping takes 10 minutes for regular paper and over one hour for paper cups!</p>
+
+            <p><strong>Why should I clean the cups and cartons?</strong></p>
+            <p>The insides are bacteria breeding grounds which could affect the recycling process.</p>
+
+          </div>
+        </div>
+
+      </div>
+      <form method="get" action="/#/home">
+      <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/plastic.html">
+      <div class='container'>
+        <div class='text-center'>
+          <h1>Plastic</h1>
+          <h4>Plastic decomposal not only takes hundreds of years, but it creates a toxic gas!</h4>
+        </div>
+
+        <div class='row'>
+          <div class='col-sm-6'>
+            <h3>PET and Plastic</h3>
+                <p>Clean and press</p>
+            <h3>Styrofoam / Polystyrene</h3>
+                <p>Clean it (if it's contaminated with food, etc, it goes in the trash)</p>
+            <h3>Rubber Wash Bowl</h3>
+                <p>Because it is mixed with synthetic resins, it should be thrown in the rubbish bin or declared as large waste.</p>
+            <h3>Tools with plastic handle</h3>
+                <p>If you are unable to seperate parts, recycle with metal</p>
+          </div>
+
+          <div class='col-sm-6'>
+            <h3>CDs, VHS Tapes, Cassetes</h3>
+              <p>CDs are recyclable (make sure personal information is erased)</p>
+              <p>VHS and Cassete cases are recycleable, but not the tapes themselves.</p>
+
+            <h3>String</h3>
+              <p>If it's stiff string with a plastic coating, recycle with plastic</p>
+              <p>Otherwise, it goes in the plastic bag bin</p>
+
+            <h3>Toys</h3>
+                <p>Disassemble and put in appropriate bin</p>
+                <p>Large toys should be declared as large waste (pay a disposal fee)</p>
+
+            <h3>Medicine Packaging</h3>
+                <p>Throw it in the trash bin</p>
+
+          </div>
+        </div>
+
+      </div>
+      <form method="get" action="/#/home">
+      <button class="btn btn-info back">Back</div></form>
+    </script>
+
+    <script type="text/ng-template" id="/search.html">
+      <div class='container text-center'>
+        <h3>Please choose the appropriate category or search below</h3><br>
+        <div class='row'>
+          <a href='/#/paper'><div class="col-sm-2"><img class='img-responsive' src='/images/paper.jpg'>Paper</div></a>
+          <a href='/#/papercups'><div class="col-sm-2"><img class='img-responsive' src='/images/papercups.jpg'>Paper Cups</div></a>
+          <a href='/#/cans'><div class="col-sm-2"><img class='img-responsive' src='/images/cans.jpg'>Cans / Metal</div></a>
+          <a href='/#/glass'><div class="col-sm-2"><img class='img-responsive' src='/images/glass.jpg'>Bottles / Glass</div></a>
+          <a href='/#/plastic'><div class="col-sm-2"><img class='img-responsive' src='/images/plastic.jpg'>Plastic</div></a>
+          <a href='/#/bags'><div class="col-sm-2"><img class='img-responsive' src='/images/bags.jpg'>Plastic Bags</div></a>
+      <div class="col-sm-12 spacing"></div>
+          <a href='/#/bulbs'><div class="col-sm-2"><img class='img-responsive' src='/images/bulbs.jpg'>Light Bulbs</div></a>
+          <a href='/#/batteries'><div class="col-sm-2"><img class='img-responsive' src='/images/batteries.jpg'>Batteries</div></a>
+          <a href='/#/clothes'><div class="col-sm-2"><img class='img-responsive' src='/images/clothes.jpg'>Clothes</div></a>
+          <a href='/#/elec'><div class="col-sm-2"><img class='img-responsive' src='/images/elec.jpg'>Electronics</div></a>
+          <a href='/#/oil'><div class="col-sm-2"><img class='img-responsive' src='/images/oil.jpg'>Used Oil</div></a>
+          <a href='/#/etc'><div class="col-sm-2"><img class='img-responsive' src='/images/etc.jpg'>Others</div></a>
+        </div><br>
+        <p>If you don't see your item, try searching below:</p>
+
+              <div class="wrapper">
+                <select class="selection">
+                  <option selected disabled>Please choose your item:</option>
+                  <option value="/#/etc">aluminum foil</option>
+                  <option value="/#/etc">automotive oil</option>
+                  <option value="/#/etc">bags (backpack)</option>
+                  <option value="/#/etc">batteries</option>
+                  <option value="/#/etc">beer bottle</option>
+                  <option value="/#/etc">bones</option>
+                  <option value="/#/etc">broken glass</option>
+                  <option value="/#/etc">bubble wrap</option>
+                  <option value="/#/etc">calendars</option>
+                  <option value="/#/etc">candles</option>
+                  <option value="/#/etc">cans (aerosol)</option>
+                  <option value="/#/etc">cans (drink)</option>
+                  <option value="/#/etc">cans (soup / veggies)</option>
+                  <option value="/#/etc">cassette tape</option>
+                  <option value="/#/etc">cd / dvd</option>
+                  <option value="/#/etc">ceramics</option>
+                  <option value="/#/etc">china / plates</option>
+                  <option value="/#/etc">cloth</option>
+                  <option value="/#/etc">clothes</option>
+                  <option value="/#/etc">coated paper</option>
+                  <option value="/#/etc">comforter</option>
+                  <option value="/#/etc">cooking oil</option>
+                  <option value="/#/etc">cotton blanket</option>
+                  <option value="/#/etc">cushions</option>
+                  <option value="/#/etc">electric blankets</option>
+                  <option value="/#/etc">electric mats</option>
+                  <option value="/#/etc">electronics (large)</option>
+                  <option value="/#/etc">electronics (small)</option>
+                  <option value="/#/etc">fabric</option>
+                  <option value="/#/etc">food waste</option>
+                  <option value="/#/etc">glass (fragile)</option>
+                  <option value="/#/etc">glass bottle</option>
+                  <option value="/#/etc">ice packs</option>
+                  <option value="/#/etc">incandescent lamps</option>
+                  <option value="/#/etc">LED bulbs</option>
+                  <option value="/#/etc">light bulbs</option>
+                  <option value="/#/etc">liquor bottle</option>
+                  <option value="/#/etc">medical supplies</option>
+                  <option value="/#/etc">medicine</option>
+                  <option value="/#/etc">medicine packaging</option>
+                  <option value="/#/etc">metal</option>
+                  <option value="/#/etc">mop</option>
+                  <option value="/#/etc">newspaper</option>
+                  <option value="/#/etc">notebooks</option>
+                  <option value="/#/etc">oil</option>
+                  <option value="/#/etc">paint cans</option>
+                  <option value="/#/etc">paper</option>
+                  <option value="/#/etc">paper bags</option>
+                  <option value="/#/etc">paper cartons</option>
+                  <option value="/#/etc">paper cups</option>
+                  <option value="/#/etc">paper towels</option>
+                  <option value="/#/etc">paper wrappers</option>
+                  <option value="/#/etc">PET bottle</option>
+                  <option value="/#/etc">plastic</option>
+                  <option value="/#/etc">plastic bags</option>
+                  <option value="/#/etc">plastic bottle</option>
+                  <option value="/#/etc">plastic container</option>
+                  <option value="/#/etc">pots / jars</option>
+                  <option value="/#/etc">receipts</option>
+                  <option value="/#/etc">rocks / minerals /gems</option>
+                  <option value="/#/etc">roller skates</option>
+                  <option value="/#/etc">roots / stems</option>
+                  <option value="/#/etc">rubber hose</option>
+                  <option value="/#/etc">rubber washbowl</option>
+                  <option value="/#/etc">sea shells</option>
+                  <option value="/#/etc">shoes</option>
+                  <option value="/#/etc">soju bottle</option>
+                  <option value="/#/etc">string (thick / coated)</option>
+                  <option value="/#/etc">string (thin)</option>
+                  <option value="/#/etc">styrofoam</option>
+                  <option value="/#/etc">suitcase (with wheels)</option>
+                  <option value="/#/etc">tea bags</option>
+                  <option value="/#/etc">toe nails</option>
+                  <option value="/#/etc">toilet paper</option>
+                  <option value="/#/etc">tools</option>
+                  <option value="/#/etc">towels</option>
+                  <option value="/#/etc">tree branch</option>
+                  <option value="/#/etc">used tape</option>
+                  <option value="/#/etc">VHS tape</option>
+                  <option value="/#/etc">wood</option>
+                  <option value="/#/etc">wooden chopsticks</option>
+                </select>
+              </div>
+
+              <br>If you still can't find it, <a href="/#/etc">click here</a> for further instructions.
+
+
+
+
+      </div>
+      <form method="get" action="/#/home">
+      <button class="btn btn-info back">Back</div></form>
+    </script>
+
+
+</body>
+</html>
