@@ -226,10 +226,11 @@ function($scope, auth){
       else if ($scope.control.state == 2){
         if(evt.data.length<15){
 
- /*         switch(evt.data){
- //           case:
- //           break;
-          } */
+          switch(evt.data){
+            case '':
+              
+            break;
+          } 
           console.log(evt.data);
         }
 
