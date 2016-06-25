@@ -9,30 +9,57 @@
 #define LEDPin2 6 // Onboard LED red
 #define LEDPin3 5 // Onboard LED grin
 
+
+//GPIO PORT IN
+#define LEDPin1 9 // Red
+#define LEDPin2 10 // Green
+#define LEDPin3 2 // Blue
+
+#define TESTPIN 1 //TEST PIN
+
 int maximumRange = 25; // Maximum range needed
 int minimumRange = 0; // Minimum range needed 
 long duration, duration2, distance, distance2, BlueSensor,RedSensor,GrinSensor;
 
+int gFlag=1;
 int flag1=0, flag2=0, flag3=0;
 int lflag=1; //int lflag1=1, lflag2=1, lflag3=1;
 
 void setup()
 {
-Serial.begin (9600);
-pinMode(trigPin1, OUTPUT);
-pinMode(echoPin1, INPUT);
-pinMode(trigPin2, OUTPUT);
-pinMode(echoPin2, INPUT);
-pinMode(trigPin3, OUTPUT);
-pinMode(echoPin3, INPUT);
+	//Serial.begin (9600);
+	pinMode(trigPin1, OUTPUT);
+	pinMode(echoPin1, INPUT);
+	pinMode(trigPin2, OUTPUT);
+	pinMode(echoPin2, INPUT);
+	pinMode(trigPin3, OUTPUT);
+	pinMode(echoPin3, INPUT);
 
-pinMode(LEDPin1, OUTPUT);
-pinMode(LEDPin2, OUTPUT);
-pinMode(LEDPin3, OUTPUT);
+	pinMode(LEDPin1, OUTPUT);
+	pinMode(LEDPin2, OUTPUT);
+	pinMode(LEDPin3, OUTPUT);
+
+	pinMode(PININ1, INPUT);
+	pinMode(PININ2, INPUT);
+	pinMode(PININ3, INPUT);
+	
+	pinMode(PINOUT1, OUTPUT);
+	
+	pinMode(PINOUT1, HIGH);
 }
 
 void loop() {
-
+	if (gFlag) {
+		gFlag = 0;
+		if (PININ1 == 1 && PININ2 == 0 && PININ3 == 0) {
+			flag1=1;
+		} else if (PININ1 == 0 && PININ2 == 1 && PININ3 == 0) {
+			flag2=1;
+		} else if (PININ1 == 0 && PININ2 == 0 && PININ3 == 1) {
+			flag3=1;
+		}
+	}
+	
 	if (flag1 == 1) {
 		SonarSensor(trigPin1, echoPin1);
 		if (!lflag) {
@@ -40,8 +67,6 @@ void loop() {
 			flag1 = 0;
 		}
 		BlueSensor = distance;
-		
-		//Serial.println(BlueSensor);
 	} else if (flag2 == 1) {
 		SonarSensor(trigPin2, echoPin2);
 		if (!lflag) {
@@ -49,8 +74,6 @@ void loop() {
 			flag2 = 0;
 		}
 		RedSensor = distance2;
-		
-		//Serial.println(RedSensor);
 	} else if (flag3 == 1) {
 		SonarSensor(trigPin3, echoPin3);
 		if (!lflag) {
@@ -58,9 +81,8 @@ void loop() {
 			flag3 = 0;
 		}
 		GrinSensor = distance;
-		
-		//Serial.println(GrinSensor)
 	}
+	gFlag = 1;
 }
 
 void SonarSensor(int trigPin,int echoPin)
