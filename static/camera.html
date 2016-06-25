@@ -51,6 +51,7 @@ $().ready(function(){
 			//Update canvas with image info
 			console.log(evt.data);
 			image.src = "data:image/jpg;base64,"+evt.data;
+			
 			context.drawImage(image,2,2);
 			connection.send(currentProg);//Algorithm is recalled
 		}
@@ -183,7 +184,7 @@ $().ready(function(){
 	</div>
 	<div class="container" style="border-top: solid 5px grey">
 		<div class="pad">
-			<canvas width="650px" height="590px" id="canvas" style="background-color:black;">
+			<canvas width="450px" height="390px" id="canvas" style="background-color:black;">
 			</canvas>
 		</div>
 	</div>
